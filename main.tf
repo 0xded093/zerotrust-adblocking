@@ -19,67 +19,51 @@ provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
-
 locals {
-  # The full path of the list holding the domain list
-  pihole_domain_list_file = "${path.module}/cloudflare/lists/pihole_domain_list.txt"
+  dollar_symbol       = "$"
+  blocklist_raw_lines = compact(split("\n", data.http.blocklist.response_body))
 
-  # Parse the file and create a list, one item per line
-  pihole_domain_list = split("\n", file(local.pihole_domain_list_file))
+  # Extract domains from the hosts file format - removing anything with a leading "-", since that fails validation
+  blocklist = [
+    for line in local.blocklist_raw_lines : split(" ", line)[1]
+    if startswith(line, "0.0.0.0 ") && line != "0.0.0.0 0.0.0.0" && !startswith(line, "0.0.0.0 -")
+  ]
 
-  # Remove empty lines
-  pihole_domain_list_clean = [ for x in local.pihole_domain_list : x if x != "" ]
+  # Create a list of lists, with a maximum of 1000 items per nested list
+  blocklist_chunks = [
+    for i in range(0, length(local.blocklist), 1000) :
+    slice(local.blocklist, i, i + min(length(local.blocklist) - i, 1000))
+  ]
 
-  # Use chunklist to split a list into fixed-size chunks
-  # It returns a list of lists
-  pihole_aggregated_lists = chunklist(local.pihole_domain_list_clean, 1000)
-
-  # Get the number of lists (chunks) created
-  pihole_list_count = length(local.pihole_aggregated_lists)
+  # Build the wirefilter expression to be used with the DNS policy
+  rule_traffic_expression = join(" or ", [
+    for list in cloudflare_teams_list.blocklist : "dns.fqdn in ${local.dollar_symbol}${list.id}"
+  ])
 }
 
-resource "cloudflare_teams_list" "pihole_domain_lists" {
-  account_id = local.cloudflare_account_id
-
-  for_each = {
-    for i in range(0, local.pihole_list_count) :
-      i => element(local.pihole_aggregated_lists, i)
-  }
-
-  name  = "pihole_domain_list_${each.key}"
-  type  = "DOMAIN"
-  items = each.value
+data "http" "blocklist" {
+  url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
 }
 
-locals {
-  # Iterate through each pihole_domain_list resource and extract its ID
-  pihole_domain_lists = [for k, v in cloudflare_teams_list.pihole_domain_lists : v.id]
-
-  # Format the values: remove dashes and prepend $
-  pihole_domain_lists_formatted = [for v in local.pihole_domain_lists : format("$%s", replace(v, "-", ""))]
-
-  # Create filters to use in the policy
-  pihole_ad_filters = formatlist("any(dns.domains[*] in %s)", local.pihole_domain_lists_formatted)
-  pihole_ad_filter  = join(" or ", local.pihole_ad_filters)
+resource "cloudflare_teams_list" "blocklist" {
+  count      = length(local.blocklist_chunks)
+  account_id = var.account_id
+  name       = "Blocklist ${count.index + 1}"
+  type       = "DOMAIN"
+  items      = local.blocklist_chunks[count.index]
 }
 
-resource "cloudflare_teams_rule" "block_ads" {
-  account_id = local.cloudflare_account_id
-
-  name        = "Block Ads"
-  description = "Block Ads domains"
-
-  enabled    = true
-  precedence = 11
-
-  # Block domain belonging to lists (defined below)
-  filters = ["dns"]
-  action  = "block"
-  traffic = local.pihole_ad_filter
-
-  rule_settings {
-    block_page_enabled = false
-  }
-
+resource "cloudflare_teams_rule" "blocklist_dns_policy" {
+  account_id  = var.account_id
+  name        = "DNS Blocklist"
+  description = "Block all blocklist entries"
+  enabled     = true
+  precedence  = 1
+  action      = "block"
+  filters     = ["dns"]
+  traffic     = local.rule_traffic_expression
+  depends_on = [
+    cloudflare_teams_list.blocklist
+  ]
 }
 
