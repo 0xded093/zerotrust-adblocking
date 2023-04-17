@@ -34,7 +34,9 @@ jobs:
         run: terraform init
       - name: Terraform Format
         run: terraform fmt -check  
+      - name: Terraform Destroy
+        run: terraform destroy
       - name: Terraform Plan
-        run: terraform plan -destroy     
+        run: terraform plan
       - name: Terraform Apply
-        run: terraform apply -auto-approve -destroy
+        run: terraform apply -auto-approve 
