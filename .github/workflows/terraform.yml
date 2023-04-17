@@ -23,6 +23,19 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+      - name: Delete previous policy
+        run: |
+          curl --request GET --url https://api.cloudflare.com/client/v4/accounts/${{ secrets.cloudflare_team_id }}/gateway/rules \
+            --header 'Content-Type: application/json' --header 'X-Auth-Email: ${{ secrets.cloudflare_auth_email }}' --header 'X-Auth-Key: ${{ secrets.cloudflare_auth_key }}' | \ 
+            jq ".result[]" | jq 'select(.name=="DNS Blocklist").id' | { read uuid; \ 
+            curl --request DELETE --url https://api.cloudflare.com/client/v4/accounts/${{ secrets.cloudflare_team_id }}/gateway/rules/$uuid \ 
+            --header 'Content-Type: application/json' --header 'X-Auth-Email: ${{ secrets.cloudflare_auth_email }}' --header 'X-Auth-Key: ${{ secrets.cloudflare_auth_key }}'}
+      - name: Delete all the previous lists
+        run: |
+          curl --request GET --url https://api.cloudflare.com/client/v4/accounts/${{ secrets.cloudflare_team_id }}/gateway/lists \
+            --header 'Content-Type: application/json' --header 'X-Auth-Email: ${{ secrets.cloudflare_auth_email }}' --header 'X-Auth-Key: ${{ secrets.cloudflare_auth_key }}' | \
+            for i in $(jq ".result[].id") ;do curl --request DELETE --url https://api.cloudflare.com/client/v4/accounts/${{ secrets.cloudflare_team_id }}/gateway/lists/$i \ 
+            --header 'Content-Type: application/json' --header 'X-Auth-Email: ${{ secrets.cloudflare_auth_email }}' --header 'X-Auth-Key: ${{ secrets.cloudflare_auth_key }}' ; done
       - name: Terraform Init
         run: terraform init
       - name: Terraform Format
