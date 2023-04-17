@@ -31,11 +31,6 @@ provider "cloudflare" {
 
 locals {
   dollar_symbol       = "$"    
-
-  filters = concat(
-    tolist(data.http.adguard_dns_filter.response_body),
-    tolist(data.http.adway_default_blocklist.response_body)
-  )  
   
   blocklist_raw_lines = compact(split("\n", "${data.http.adguard_dns_filter.response_body}\n${data.http.adway_default_blocklist.response_body}"))
     
