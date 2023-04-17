@@ -31,8 +31,14 @@ provider "cloudflare" {
 
 locals {
   dollar_symbol       = "$"    
-  blocklist_raw_lines = compact(split("\n", data.http.adguard_dns_filter.response_body)) + compact(split("\n", data.http.adway_default_blocklist.response_body))
   
+  filters = [ 
+    data.http.adguard_dns_filter.response_body,
+    data.http.adway_default_blocklist.response_body
+    ]
+  
+  blocklist_raw_lines = compact(split(join("\n", filters)))
+    
   # Extract domains from the hosts file format - removing anything with a leading "-", since that fails validation
   blocklist = [
     for line in local.blocklist_raw_lines : split(" ", line)[1]
