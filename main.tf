@@ -4,6 +4,13 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 3.0"
     }
+  }  
+  cloud {
+    organization = "dedins"
+
+    workspaces {
+      name = "zerotrust-adblocking-explicit"
+    }
   }
 }
 
