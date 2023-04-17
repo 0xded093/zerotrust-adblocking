@@ -37,7 +37,7 @@ locals {
     tolist(data.http.adway_default_blocklist.response_body)
   )  
   
-  blocklist_raw_lines = compact(split("\n", ${data.http.adguard_dns_filter.response_body}${data.http.adway_default_blocklist.response_body}))
+  blocklist_raw_lines = compact(split("\n", "${data.http.adguard_dns_filter.response_body}\n${data.http.adway_default_blocklist.response_body}"))
     
   # Extract domains from the hosts file format - removing anything with a leading "-", since that fails validation
   blocklist = [
