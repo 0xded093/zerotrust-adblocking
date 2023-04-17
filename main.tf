@@ -5,7 +5,7 @@ terraform {
     workspaces {
       name = "zerotrust-adblocking-explicit"
     }
-  }
+  },
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
