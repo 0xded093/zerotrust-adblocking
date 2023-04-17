@@ -24,7 +24,6 @@ jobs:
         with:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       - name: Delete previous lists and policy
-        continue-on-error: true
         run: python3 api_cloudflare_delete.py
         env:
           CLOUDFLARE_TEAM_ID: ${{ secrets.cloudflare_team_id }}
