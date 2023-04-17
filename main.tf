@@ -30,9 +30,9 @@ provider "cloudflare" {
 }
 
 locals {
-  dollar_symbol       = "$"
-  blocklist_raw_lines = join("\n", [for filter in data.http: compact(split("\n", filter.response_body))])
-  
+  dollar_symbol       = "$"    
+  blocklist_raw_lines = join("\n", [ compact(split("\n", data.http.adguard_dns_filter.response_body)), compact(split("\n", data.http.adway_default_blocklist.response_body))])
+
   # Extract domains from the hosts file format - removing anything with a leading "-", since that fails validation
   blocklist = [
     for line in local.blocklist_raw_lines : split(" ", line)[1]
@@ -88,7 +88,6 @@ data "http" "steven_blacks_list" {
   url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_33.txt"
 }
 
-
 resource "cloudflare_teams_list" "blocklist" {
   count      = length(local.blocklist_chunks)
   account_id = var.account_id
@@ -110,4 +109,3 @@ resource "cloudflare_teams_rule" "blocklist_dns_policy" {
     cloudflare_teams_list.blocklist
   ]
 }
-
