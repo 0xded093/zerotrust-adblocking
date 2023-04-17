@@ -33,8 +33,8 @@ locals {
   dollar_symbol       = "$"    
 
   filters = concat(
-    data.http.adguard_dns_filter.response_body,
-    data.http.adway_default_blocklist.response_body
+    tolist(data.http.adguard_dns_filter.response_body),
+    tolist(data.http.adway_default_blocklist.response_body)
   )  
   
   
