@@ -6,6 +6,11 @@ terraform {
       name = "zerotrust-adblocking-explicit"
     }
   }
+  required_providers {
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 3.0"
+    }
 }
 
 variable "cloudflare_api_token" {
