@@ -7,6 +7,7 @@ terraform {
     }
   }
 }
+
 terraform {
   required_providers {
     cloudflare = {
