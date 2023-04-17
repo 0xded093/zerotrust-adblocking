@@ -10,4 +10,4 @@ curl --request GET --url https://api.cloudflare.com/client/v4/accounts/$CLOUDFLA
 curl --request GET --url https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_TEAM_ID/gateway/lists \
   --header 'Content-Type: application/json' --header 'X-Auth-Email: $CLOUDFLARE_AUTH_EMAIL' --header 'X-Auth-Key: $CLOUDFLARE_AUTH_KEY' | \
   for i in $(jq ".result[].id") ;do curl --request DELETE --url https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_TEAM_ID/gateway/lists/$i \ 
-  --header 'Content-Type: application/json' --header 'X-Auth-Email: $CLOUDFLARE_AUTH_EMAIL' --header 'X-Auth-Key: $CLOUDFLARE_AUTH_KEY' ; done
+  --header 'Content-Type: application/json' --header 'X-Auth-Email: $CLOUDFLARE_AUTH_EMAIL' --header 'X-Auth-Key: $CLOUDFLARE_AUTH_KEY' ; done ;
