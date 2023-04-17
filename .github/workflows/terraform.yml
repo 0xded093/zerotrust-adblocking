@@ -29,5 +29,9 @@ jobs:
         run: terraform fmt -check
       - name: Terraform Plan
         run: terraform plan
+      - name: Terraform Destroy Blocklists
+        run: terraform destroy -target cloudflare_teams_list.blocklist -auto-approve
+      - name: Terraform Destroy Policy
+        run: terraform destroy -target cloudflare_teams_rule.blocklist_dns_policy -auto-approve        
       - name: Terraform Apply
         run: terraform apply -auto-approve
