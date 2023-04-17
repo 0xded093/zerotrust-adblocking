@@ -22,7 +22,7 @@ for rule in json.loads(response.text)['result']:
             print("[-] Deleting rule:", rule["id"])
             response = requests.request("DELETE", url, headers=headers)
             print(response.text)
-     except:
+    except:
         pass
 
 print("[+] Getting current lists")
@@ -35,5 +35,5 @@ for list in json.loads(response.text)['result']:
         print("[-] Deleting list:", list["id"])
         response = requests.request("DELETE", url2, headers=headers)
         print(response.text)
-     except:
+    except:
         pass        
