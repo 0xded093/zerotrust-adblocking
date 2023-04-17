@@ -34,8 +34,8 @@ jobs:
         run: terraform init
       - name: Terraform Format
         run: terraform fmt -check  
-      - name: Terraform Destroy
-        run: terraform destroy
+      - name: Terraform Forget Old State
+        run: terraform state rm 'cloudflare_teams_list.blocklist' ; terraform state rm 'cloudflare_teams_rule.blocklist_dns_policy' 
       - name: Terraform Plan
         run: terraform plan
       - name: Terraform Apply
