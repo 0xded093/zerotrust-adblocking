@@ -35,6 +35,7 @@ jobs:
       - name: Terraform Format
         run: terraform fmt -check  
       - name: Terraform Forget Old State
+        continue-on-error: true
         run: terraform state rm 'cloudflare_teams_list.blocklist' ; terraform state rm 'cloudflare_teams_rule.blocklist_dns_policy' 
       - name: Terraform Plan
         run: terraform plan
