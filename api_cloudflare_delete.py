@@ -7,7 +7,6 @@ CLOUDFLARE_AUTH_EMAIL = os.getenv('CLOUDFLARE_AUTH_EMAIL')
 CLOUDFLARE_AUTH_KEY = os.getenv('CLOUDFLARE_AUTH_KEY')
 
 url = "https://api.cloudflare.com/client/v4/accounts/"+CLOUDFLARE_TEAM_ID+"/gateway/lists/"
-
 headers = {
     "Content-Type": "application/json",
     "X-Auth-Email": CLOUDFLARE_AUTH_EMAIL,
