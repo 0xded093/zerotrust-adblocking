@@ -31,8 +31,8 @@ provider "cloudflare" {
 
 locals {
   dollar_symbol       = "$"
-  blocklist_raw_lines = compact(split("\n", data.http.blocklist.response_body))
-
+  blocklist_raw_lines = join("\n", [for filter in data.http: compact(split("\n", filter.response_body))])
+  
   # Extract domains from the hosts file format - removing anything with a leading "-", since that fails validation
   blocklist = [
     for line in local.blocklist_raw_lines : split(" ", line)[1]
@@ -51,9 +51,43 @@ locals {
   ])
 }
 
-data "http" "blocklist" {
-  url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
+data "http" "adguard_dns_filter" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt"
 }
+data "http" "adway_default_blocklist" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt"
+}
+data "http" "dandelion_sprouts_game_console_adblock_list" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_6.txt"
+}
+data "http" "perflyst_dandelion_sprout_smart_tv_blocklist_for_adguard_home" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_7.txt"
+}
+data "http" "scam_blocklist_by_durablenapkin" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_10.txt"
+}
+data "http" "urlhaus_filter_online" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt"
+}    
+data "http" "NOR_dandelion_sprouts_anti_malware_list" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_13.txt"
+}
+data "http" "ITA_filtri_dns" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_18.txt"
+}
+data "http" "windowsspyblocker_hosts_spy_rules" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_23.txt"
+}        
+data "http" "curben_phishing_filter" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_30.txt"
+}
+data "http" "notracking_hosts_blocklists" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_32.txt"
+}
+data "http" "steven_blacks_list" {
+  url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_33.txt"
+}
+
 
 resource "cloudflare_teams_list" "blocklist" {
   count      = length(local.blocklist_chunks)
