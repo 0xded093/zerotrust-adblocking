@@ -25,7 +25,7 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       - name: Delete previous policy
         run: |
-          curl --request GET --url https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_TEAM_ID/gateway/rules --header 'Content-Type: application/json' --header 'X-Auth-Email: $CLOUDFLARE_AUTH_EMAIL' --header 'X-Auth-Key: $CLOUDFLARE_AUTH_KEY' | jq ".result[]" | jq 'select(.name=="DNS Blocklist").id' 
+          jq
         env:
           CLOUDFLARE_TEAM_ID: ${{ secrets.cloudflare_team_id }}
           CLOUDFLARE_AUTH_EMAIL: ${{ secrets.cloudflare_auth_email }}
