@@ -5,6 +5,9 @@ on:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 10 15 * *' # At 10:00 on day-of-month 15  
 
 jobs:
   terraform:
