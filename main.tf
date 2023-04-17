@@ -5,12 +5,15 @@ terraform {
     workspaces {
       name = "zerotrust-adblocking-explicit"
     }
-  },
+  }
+}
+terraform {
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
       version = "~> 3.0"
     }
+  }
 }
 
 variable "cloudflare_api_token" {
