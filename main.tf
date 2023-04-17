@@ -37,7 +37,7 @@ locals {
     data.http.adway_default_blocklist.response_body
     ]
   
-  blocklist_raw_lines = compact(split(join("\n", filters)))
+  blocklist_raw_lines = compact(split(concat(filters)))
     
   # Extract domains from the hosts file format - removing anything with a leading "-", since that fails validation
   blocklist = [
