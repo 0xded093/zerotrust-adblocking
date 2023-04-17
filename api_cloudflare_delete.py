@@ -14,22 +14,26 @@ headers = {
     "X-Auth-Key": CLOUDFLARE_AUTH_KEY
 }
 response = requests.request("GET", url, headers=headers)
-print(response.text)
 
 for rule in json.loads(response.text)['result']:
-    if rule["name"] == "DNS Blocklist":
-        url = url + rule["id"] 
-        print("[-] Deleting rule:", rule["id"])
-        response = requests.request("DELETE", url, headers=headers)
-        print(response.text)
+    try:
+        if rule["name"] == "DNS Blocklist":
+            url = url + rule["id"] 
+            print("[-] Deleting rule:", rule["id"])
+            response = requests.request("DELETE", url, headers=headers)
+            print(response.text)
+     except:
+        pass
 
 print("[+] Getting current lists")
 url = "https://api.cloudflare.com/client/v4/accounts/"+CLOUDFLARE_TEAM_ID+"/gateway/lists/"
 response = requests.request("GET", url, headers=headers)
-print(response.text)
 
 for list in json.loads(response.text)['result']:
+    try:    
         url2 = url + list["id"] 
         print("[-] Deleting list:", list["id"])
         response = requests.request("DELETE", url2, headers=headers)
         print(response.text)
+     except:
+        pass        
