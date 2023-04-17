@@ -32,7 +32,7 @@ provider "cloudflare" {
 locals {
   dollar_symbol       = "$"    
   
-  blocklist_raw_lines = compact(split("\n", data.http.adguard_dns_filter.response_body))
+  blocklist_raw_lines = compact(split("\n", data.http.steven_blacks_list.response_body))
     
   # Extract domains from the hosts file format - removing anything with a leading "-", since that fails validation
   blocklist = [
