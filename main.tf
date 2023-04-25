@@ -52,6 +52,7 @@ locals {
   ])
 }
 
+/*
 data "http" "adguard_dns_filter" {
   url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt"
 }
@@ -85,6 +86,7 @@ data "http" "curben_phishing_filter" {
 data "http" "notracking_hosts_blocklists" {
   url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_32.txt"
 }
+*/
 data "http" "steven_blacks_list" {
   url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_33.txt"
 }
