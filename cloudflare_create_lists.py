@@ -6,6 +6,8 @@ CLOUDFLARE_TEAM_ID = os.getenv('CLOUDFLARE_TEAM_ID')
 CLOUDFLARE_AUTH_EMAIL = os.getenv('CLOUDFLARE_AUTH_EMAIL')
 CLOUDFLARE_AUTH_KEY = os.getenv('CLOUDFLARE_AUTH_KEY')
 
+base_url = "https://api.cloudflare.com/client/v4/accounts/"+CLOUDFLARE_TEAM_ID
+
 blocklists = {
     "adguard_dns_filter": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt",
     "adway_default_blocklist": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_2.txt",
@@ -60,7 +62,7 @@ try:
     for blocklist in blocklists:
         print(f"[+] Creating list {blocklist}")
 
-        url = "https://api.cloudflare.com/client/v4/accounts/"+CLOUDFLARE_TEAM_ID+"/gateway/lists/"
+        url = base_url+"/gateway/lists/"
 
         payload = {
             "name":blocklist, 
@@ -73,9 +75,29 @@ try:
             payload["items"].append({"value":hostname})
         
         response = requests.request("POST", url, headers=headers, json=payload)
+    
+    blocklists = requests.request("GET", url, headers=headers).json()
+    
+    blocklists_ids = []
+    blocklists_ids.append("dns.fqdn in $")
+    for blocklist in blocklists["result"]:
+        blocklists_ids.append(blocklist["id"])
+        blocklists_ids.append(" or in $")
+    
+    blocklists_ids.pop()
+    
 
-        print(str(response.status_code) + response.text)
-
+    payload = {
+        "action": "block",
+        "description": "",
+        "enabled": True,
+        "filters": ["dns"],
+        "name": "Block Blocklists",
+        "traffic": ''.join(map(str, blocklists_ids))
+    }
+    
+    url = base_url+"/gateway/rules"
+    response = requests.request("POST", url, headers=headers, json=payload)
 
 except Exception as e:
     raise e
