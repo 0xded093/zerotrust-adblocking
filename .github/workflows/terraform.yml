@@ -19,24 +19,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
       - name: Delete previous lists and policy
         run: python3 api_cloudflare_delete.py
         env:
           CLOUDFLARE_TEAM_ID: ${{ secrets.cloudflare_team_id }}
           CLOUDFLARE_AUTH_EMAIL: ${{ secrets.cloudflare_auth_email }}
-          CLOUDFLARE_AUTH_KEY: ${{ secrets.cloudflare_auth_key }}          
-      - name: Terraform Init
-        run: terraform init
-      - name: Terraform Format
-        run: terraform fmt   
-      - name: Terraform Forget Old State
-        continue-on-error: true
-        run: terraform state rm 'cloudflare_teams_list.blocklist' ; terraform state rm 'cloudflare_teams_rule.blocklist_dns_policy' 
-      - name: Terraform Plan
-        run: terraform plan
-      - name: Terraform Apply
-        run: terraform apply -auto-approve 
+          CLOUDFLARE_AUTH_KEY: ${{ secrets.cloudflare_auth_key }}    
+      - name: Create new lists and policy
+        run: python3 cloudflare_create_lists.py
+        env:
+          CLOUDFLARE_TEAM_ID: ${{ secrets.cloudflare_team_id }}
+          CLOUDFLARE_AUTH_EMAIL: ${{ secrets.cloudflare_auth_email }}
+          CLOUDFLARE_AUTH_KEY: ${{ secrets.cloudflare_auth_key }}              
