@@ -1,4 +1,4 @@
-name: 'Terraform'
+name: 'Push Cloudflare'
 
 on:
   push:
@@ -10,8 +10,8 @@ on:
     - cron: '0 10 15 * *' # At 10:00 on day-of-month 15  
 
 jobs:
-  terraform:
-    name: 'Terraform'
+  push-cloudflare:
+    name: 'Push Cloudflare'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -19,14 +19,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Delete previous lists and policy
+      - name: Delete
         run: python3 api_cloudflare_delete.py
         env:
           CLOUDFLARE_TEAM_ID: ${{ secrets.cloudflare_team_id }}
           CLOUDFLARE_AUTH_EMAIL: ${{ secrets.cloudflare_auth_email }}
           CLOUDFLARE_AUTH_KEY: ${{ secrets.cloudflare_auth_key }}    
-      - name: Create new lists and policy
-        run: python3 cloudflare_create_lists.py
+      - name: Create
+        run: python3 api_cloudflare_create.py
         env:
           CLOUDFLARE_TEAM_ID: ${{ secrets.cloudflare_team_id }}
           CLOUDFLARE_AUTH_EMAIL: ${{ secrets.cloudflare_auth_email }}
